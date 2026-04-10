@@ -1,0 +1,2311 @@
+<!DOCTYPE html>
+<!-- saved from url=(0045)file:///C:/Users/celes/buckshot-roulette.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buckshot Roulette</title>
+    <link href="./Buckshot Roulette v2 (very ahh)_files/css2" rel="stylesheet">
+    <style>
+        :root {
+            --blood: #8b0000;
+            --dark: #0a0a0a;
+            --metal: #2a2a2a;
+            --neon-red: #ff1a1a;
+            --neon-green: #00ff00;
+            --cream: #f5e6c4;
+            --gold: #d4af37;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Special Elite', monospace;
+            background: var(--dark);
+            color: var(--cream);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: 
+                radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 100%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px);
+            padding: 20px;
+        }
+        
+        #title-screen, #betting-screen, #round-transition {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: 
+                radial-gradient(ellipse at center, #1a0a0a 0%, #0a0000 100%);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-family: 'Creepster', cursive;
+            font-size: 4rem;
+            color: var(--neon-red);
+            text-shadow: 0 0 20px var(--blood), 0 0 40px var(--blood);
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        
+        .bank-display {
+            font-size: 2rem;
+            color: var(--gold);
+            margin: 20px 0;
+            text-shadow: 0 0 10px var(--gold);
+        }
+        
+        #player-name-display {
+            font-size: 1rem;
+            color: var(--cream);
+            margin-bottom: 10px;
+            display: none;
+        }
+        
+        .menu-btn {
+            background: linear-gradient(180deg, #333 0%, #1a1a1a 100%);
+            border: 2px solid var(--metal);
+            color: var(--cream);
+            padding: 15px 40px;
+            font-family: 'Special Elite', monospace;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .menu-btn:hover {
+            background: linear-gradient(180deg, #444 0%, #2a2a2a 100%);
+            border-color: var(--neon-red);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .menu-btn.primary {
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+        }
+        
+        .menu-btn.primary:disabled {
+            border-color: #444;
+            color: #444;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .menu-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .clipboard {
+            background: #f5f5dc;
+            color: #333;
+            width: 400px;
+            max-width: 90vw;
+            margin: 20px auto;
+            padding: 0;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+            font-family: 'Special Elite', monospace;
+            transform: rotate(-2deg);
+        }
+        
+        .clipboard-header {
+            background: #8b4513;
+            color: #f5f5dc;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        
+        .clipboard-clip {
+            font-size: 1.2rem;
+        }
+        
+        .clipboard-content {
+            padding: 20px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+        
+        .clipboard-content h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .clipboard-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .clipboard-content li {
+            margin: 8px 0;
+            padding-left: 10px;
+            border-left: 3px solid #8b4513;
+        }
+        
+        .signature-line {
+            margin: 20px 0;
+            border-top: 2px dashed #333;
+            padding-top: 15px;
+        }
+        
+        .signature-line label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .signature-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #333;
+            font-family: 'Special Elite', monospace;
+            font-size: 1rem;
+            background: transparent;
+        }
+        
+        .waiver-text {
+            font-size: 0.7rem;
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        #round-display {
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+        
+        #shell-display {
+            display: none;
+        }
+        
+        .shell {
+            width: 30px;
+            height: 50px;
+            border-radius: 5px 5px 3px 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
+            border: 2px solid #5a5a5a;
+            color: #8a8a8a;
+        }
+        
+        .shell.fired {
+            opacity: 0.3;
+            transform: scale(0.8);
+        }
+        
+        .shell.current {
+            box-shadow: 0 0 15px var(--neon-red);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 15px var(--neon-red); }
+            50% { box-shadow: 0 0 30px var(--neon-red); }
+        }
+        
+        #shotgun {
+            width: 300px;
+            height: 80px;
+            background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            border: 3px solid #444;
+            position: relative;
+        }
+        
+        #shotgun::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 60px;
+            background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+            right: -25px;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        #shotgun-chamber {
+            width: 40px;
+            height: 60px;
+            border: 2px solid #555;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a0a;
+        }
+        
+        #shotgun-chamber .shell {
+            width: 20px;
+            height: 35px;
+            margin: 0;
+        }
+        
+        #game-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px 0;
+        }
+        
+        .player-area {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid var(--metal);
+            border-radius: 10px;
+            min-width: 150px;
+            background: rgba(0,0,0,0.5);
+        }
+        
+        .player-area.active {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(0,255,0,0.2);
+        }
+        
+        .player-name {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--cream);
+        }
+        
+        .charges {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        
+        .charge {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+            transition: all 0.3s;
+        }
+        
+        .charge.lost {
+            background: #333;
+            box-shadow: none;
+            border: 1px solid #444;
+        }
+        
+        #controls {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 2px solid var(--neon-red);
+            color: var(--neon-red);
+            padding: 15px 30px;
+            font-family: 'Special Elite', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        
+        .action-btn:hover:not(:disabled) {
+            background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+            box-shadow: 0 0 20px rgba(255,0,0,0.4);
+            transform: scale(1.05);
+        }
+        
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .action-btn.self {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+        
+        .action-btn.self:hover:not(:disabled) {
+            box-shadow: 0 0 20px rgba(0,255,0,0.4);
+        }
+        
+        #items-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+            min-height: 60px;
+        }
+        
+        .item {
+            background: linear-gradient(180deg, #333 0%, #222 100%);
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 10px 20px;
+            font-family: 'Special Elite', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .item:hover {
+            background: linear-gradient(180deg, #444 0%, #333 100%);
+            box-shadow: 0 0 15px rgba(212,175,55,0.4);
+            transform: scale(1.05);
+        }
+        
+        .item.used {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        #message {
+            font-size: 1.2rem;
+            color: var(--cream);
+            min-height: 30px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        #message.error {
+            color: var(--neon-red);
+        }
+        
+        #message.success {
+            color: var(--neon-green);
+        }
+        
+        #log {
+            width: 100%;
+            max-width: 600px;
+            height: 150px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--metal);
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            margin: 10px 0;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid var(--metal);
+        }
+        
+        .log-entry.blank {
+            border-color: var(--neon-green);
+            color: #8f8;
+        }
+        
+        .log-entry.live {
+            border-color: var(--neon-red);
+            color: #f88;
+        }
+        
+        .log-entry.damage {
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+            font-weight: bold;
+        }
+        
+        #dealer-items {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        
+        .dealer-item {
+            width: 40px;
+            height: 40px;
+            background: #222;
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+        
+        #game-over {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 100;
+        }
+        
+        .result-title {
+            font-family: 'Creepster', cursive;
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .result-title.win {
+            color: var(--neon-green);
+            text-shadow: 0 0 30px var(--neon-green);
+        }
+        
+        .result-title.lose {
+            color: var(--neon-red);
+            text-shadow: 0 0 30px var(--neon-red);
+        }
+        
+        .result-subtitle {
+            font-size: 1.5rem;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        
+        #shell-count {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+        
+        .shell-count-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .shell-count-item .dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+        
+        .shell-count-item .dot.blank {
+            background: #4a4a4a;
+            border: 1px solid #5a5a5a;
+        }
+        
+        .shell-count-item .dot.live {
+            background: #6b0000;
+            border: 1px solid #8b0000;
+        }
+        
+        .screen-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+        }
+        
+        .screen-flash.fire {
+            animation: flash 0.5s;
+        }
+        
+        @keyframes flash {
+            0% { opacity: 0.8; }
+            100% { opacity: 0; }
+        }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        #pills-modal {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
+        }
+        
+        .pills-title {
+            font-family: 'Creepster', cursive;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+        
+        #pills-game {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .pills-shells {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .pills-shell {
+            width: 40px;
+            height: 60px;
+            border-radius: 5px;
+            background: #333;
+            border: 2px solid #555;
+        }
+        
+        .pills-shell.revealed.blank {
+            background: #2a4a2a;
+            border-color: var(--neon-green);
+        }
+        
+        #cheat-terminal {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 600px;
+            height: 400px;
+            background: #0c0c0c;
+            border: 1px solid #333;
+            border-radius: 5px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            color: #cccccc;
+            z-index: 200;
+            box-shadow: 0 0 30px rgba(0, 150, 255, 0.3);
+        }
+        
+        #cheat-terminal.visible {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .terminal-title {
+            color: #cccccc;
+            font-size: 12px;
+        }
+        
+        .terminal-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .terminal-controls span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        .terminal-controls .minimize { background: #f1c40f; color: #000; }
+        .terminal-controls .maximize { background: #2ecc71; color: #000; }
+        .terminal-controls .close { background: #e74c3c; color: #fff; }
+        
+        .terminal-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            overflow: hidden;
+        }
+        
+        .terminal-output {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            color: #cccccc;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .terminal-output .error { color: #e74c3c; }
+        .terminal-output .success { color: #2ecc71; }
+        .terminal-output .info { color: #3498db; }
+        .terminal-output .warning { color: #f39c12; }
+        
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #333;
+            padding-top: 8px;
+        }
+        
+        .prompt {
+            color: #569cd6;
+            margin-right: 8px;
+        }
+        
+        .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #cccccc;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            outline: none;
+        }
+        
+        .terminal-autocomplete {
+            position: absolute;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 250;
+            display: none;
+            min-width: 200px;
+        }
+        
+        .terminal-autocomplete.visible {
+            display: block;
+        }
+        
+        .terminal-autocomplete li {
+            padding: 5px 10px;
+            cursor: pointer;
+            color: #cccccc;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .terminal-autocomplete li:hover,
+        .terminal-autocomplete li.selected {
+            background: #0a4a8a;
+            color: #fff;
+        }
+        
+        .terminal-autocomplete li .desc {
+            color: #666;
+            font-size: 11px;
+        }
+        
+        .terminal-input-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .pills-shell.revealed.live {
+            background: #4a0000;
+            border-color: var(--neon-red);
+        }
+        
+        .bet-input {
+            background: #1a1a1a;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 15px 30px;
+            font-family: 'Special Elite', monospace;
+            font-size: 1.5rem;
+            text-align: center;
+            width: 200px;
+            margin: 10px;
+        }
+        
+        .bet-input:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(212,175,55,0.4);
+        }
+        
+        .bet-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .bet-btn {
+            background: linear-gradient(180deg, #333 0%, #1a1a1a 100%);
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 10px 20px;
+            font-family: 'Special Elite', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .bet-btn:hover {
+            background: linear-gradient(180deg, #444 0%, #2a2a2a 100%);
+            box-shadow: 0 0 15px rgba(212,175,55,0.4);
+        }
+        
+        .round-info {
+            font-size: 1.2rem;
+            color: var(--cream);
+            margin: 15px 0;
+        }
+        
+        .round-info span {
+            color: var(--neon-green);
+        }
+        
+        .payout-info {
+            font-size: 1rem;
+            color: #888;
+            margin: 10px 0;
+        }
+        
+        .bet-error {
+            color: var(--neon-red);
+            font-size: 1rem;
+            margin: 10px 0;
+            min-height: 20px;
+        }
+        
+        .current-bet-display {
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin: 10px 0;
+        }
+        
+        #transition-title {
+            font-family: 'Creepster', cursive;
+            font-size: 3rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+        
+        #transition-message {
+            font-size: 1.2rem;
+            color: var(--cream);
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div id="title-screen">
+        <h1>Buckshot Roulette</h1>
+        <p class="subtitle">Place your bets...</p>
+        <div class="bank-display">Bank: $<span id="title-bank">50,000</span></div>
+        <div id="player-name-display"></div>
+        <button class="menu-btn primary" id="play-btn" onclick="goToBetting()">Play</button>
+        
+        <div id="rules-clipboard" class="clipboard">
+            <div class="clipboard-header">
+                <span class="clipboard-clip">📎</span>
+                <span>OFFICIAL RULES</span>
+                <span class="clipboard-clip">📎</span>
+            </div>
+            <div class="clipboard-content">
+                <h3>Buckshot Roulette - Rules</h3>
+                <ul>
+                    <li><strong>Objective:</strong> Survive 10 rounds against the Dealer</li>
+                    <li><strong>Double or Nothing:</strong> After 10 rounds, choose to risk winnings for 3 BONUS rounds</li>
+                    <li><strong>Charges:</strong> Each player has lives (charges). Lose all = die.</li>
+                    <li><strong>Shells:</strong> Shotgun loaded with live &amp; blank shells in random order</li>
+                    <li><strong>Turns:</strong> Choose to shoot yourself or the Dealer</li>
+                    <li><strong>Blanks:</strong> No damage. Shooting yourself with blank = keep turn.</li>
+                    <li><strong>Live Shells:</strong> Cause damage (1-3 based on items)</li>
+                    <li><strong>Items:</strong> Use items to gain advantages - 20+ types available!</li>
+                    <li><strong>Betting:</strong> Place bets before each round ($100 minimum)</li>
+                    <li><strong>Payouts:</strong> Increase each round: 2x → 7x</li>
+                </ul>
+                <div class="signature-line">
+                    <label>Player Signature (Optional):</label>
+                    <input type="text" id="player-signature" class="signature-input" placeholder="Type your name">
+                </div>
+                <div class="waiver-text">
+                    ⚠️ By signing above, I acknowledge that death is permanent and the casino bears no responsibility for any casualties.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="betting-screen">
+        <h1>Place Your Bet</h1>
+        <div class="bank-display">Bank: $<span id="betting-bank">50,000</span></div>
+        <div class="round-info">Round <span id="bet-round-num">1</span> of <span id="total-rounds">10</span></div>
+        <div class="payout-info">Payout: <span id="payout-rate">2x</span></div>
+        <div class="current-bet-display">Current Bet: $<span id="current-bet">0</span></div>
+        <input type="number" class="bet-input" id="bet-input" min="100" step="100" value="1000">
+        <div class="bet-buttons">
+            <button class="bet-btn" onclick="setBet(100)">+100</button>
+            <button class="bet-btn" onclick="setBet(500)">+500</button>
+            <button class="bet-btn" onclick="setBet(1000)">+1K</button>
+            <button class="bet-btn" onclick="setBet(5000)">+5K</button>
+            <button class="bet-btn" onclick="setBet(10000)">+10K</button>
+        </div>
+        <div class="bet-buttons">
+            <button class="bet-btn" onclick="setBet(-100)">-100</button>
+            <button class="bet-btn" onclick="setBet(-500)">-500</button>
+            <button class="bet-btn" onclick="setBet(-1000)">-1K</button>
+            <button class="bet-btn" onclick="halfBet()">1/2</button>
+            <button class="bet-btn" onclick="maxBet()">MAX</button>
+        </div>
+        <div class="bet-error" id="bet-error"></div>
+        <button class="menu-btn primary" onclick="startRound()">Start Round</button>
+    </div>
+    
+    <div id="round-transition">
+        <div id="transition-title">Round Complete!</div>
+        <div id="transition-message">You won this round!</div>
+        <div class="bank-display">Bank: $<span id="transition-bank">50,000</span></div>
+        <button class="menu-btn primary" onclick="goToBetting()">Continue</button>
+    </div>
+    
+    <div id="game-container">
+        <div id="round-display">Round 1</div>
+        
+        <div id="shell-count">
+            <div class="shell-count-item"><div class="dot blank"></div> <span id="blank-count">0</span> blanks</div>
+            <div class="shell-count-item"><div class="dot live"></div> <span id="live-count">0</span> live</div>
+        </div>
+        
+        <div id="shell-display"></div>
+        
+        <div id="shotgun">
+            <div id="shotgun-chamber"></div>
+        </div>
+        
+        <div id="game-area">
+            <div class="player-area" id="player-area">
+                <div class="player-name">You</div>
+                <div class="charges" id="player-charges"></div>
+            </div>
+            
+            <div class="player-area" id="dealer-area">
+                <div class="player-name">Dealer</div>
+                <div class="charges" id="dealer-charges"></div>
+                <div id="dealer-items"></div>
+            </div>
+        </div>
+        
+        <div id="message"></div>
+        
+        <div id="items-container"></div>
+        
+        <div id="controls">
+            <button class="action-btn" id="shoot-dealer-btn" onclick="shootDealer()">Shoot Dealer</button>
+            <button class="action-btn self" id="shoot-self-btn" onclick="shootSelf()">Shoot Self</button>
+        </div>
+        
+        <div id="log"></div>
+    </div>
+    
+    <div id="game-over">
+        <div class="result-title" id="result-title">You Win</div>
+        <div class="result-subtitle" id="result-subtitle">The dealer is dead</div>
+        <div class="bank-display" id="final-bank">Bank: $50,000</div>
+        <button class="menu-btn primary" onclick="returnToTitle()">Return to Menu</button>
+    </div>
+    
+    <div id="pills-modal">
+        <div class="pills-title">Double or Nothing</div>
+        <div id="pills-game">
+            <p style="color: #888;">The dealer shows you 3 shells. 1 is live, 2 are blank.</p>
+            <div class="pills-shells" id="pills-shells"></div>
+            <div id="pills-message"></div>
+            <button class="action-btn" onclick="playPills()">Play</button>
+            <button class="action-btn self" onclick="skipPills()">Skip</button>
+        </div>
+    </div>
+    
+    <div class="screen-flash" id="screen-flash"></div>
+    
+    <div id="cheat-terminal">
+        <div class="terminal-header">
+            <span class="terminal-title">Windows PowerShell</span>
+            <span class="terminal-controls">
+                <span class="minimize">_</span>
+                <span class="maximize">□</span>
+                <span class="close" onclick="toggleTerminal()">×</span>
+            </span>
+        </div>
+        <div class="terminal-body">
+            <div class="terminal-output" id="terminal-output">
+                <div>PS C:\Users\Player&gt; Buckshot Cheat Terminal v1.0</div>
+                <div>Type 'help' for available commands</div>
+                <div>----------------------------------------</div>
+            </div>
+            <div class="terminal-input-line">
+                <span class="prompt">PS C:\Users\Player&gt;</span>
+                <div class="terminal-input-wrapper">
+                    <input type="text" id="terminal-input" class="terminal-input" autocomplete="off">
+                    <ul id="terminal-autocomplete" class="terminal-autocomplete"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const ITEMS = {
+            magnifyingGlass: { name: 'Magnifying Glass', icon: '🔍', description: 'Examine current shell', cost: 1 },
+            beer: { name: 'Beer', icon: '🍺', description: 'Eject current shell', cost: 1 },
+            handcuffs: { name: 'Handcuffs', icon: '⛓️', description: 'Dealer skips next turn', cost: 1 },
+            handSaw: { name: 'Hand Saw', icon: '🪚', description: 'Double damage', cost: 1 },
+            cigarettes: { name: 'Cigarettes', icon: '🚬', description: 'Heal 1 charge', cost: 1 },
+            pills: { name: 'Pills', icon: '💊', description: 'Double or Nothing minigame', cost: 1 },
+            inverter: { name: 'Inverter', icon: '🔄', description: 'Reverse shell type', cost: 1 },
+            adrenaline: { name: 'Adrenaline', icon: '💉', description: 'Steal and use dealer item', cost: 1 },
+            burnerPhone: { name: 'Burner Phone', icon: '📱', description: 'Show random shell in stack', cost: 1 },
+            expiredMedicine: { name: 'Expired Meds', icon: '💊', description: '40% heal 2, 60% lose 1', cost: 1 },
+            bandage: { name: 'Bandage', icon: '🩹', description: 'Heal 2 charges', cost: 1 },
+            syringe: { name: 'Syringe', icon: '💉', description: 'Full heal player', cost: 1 },
+            dynamite: { name: 'Dynamite', icon: '🧨', description: 'Skip 3 shells', cost: 1 },
+            shield: { name: 'Shield', icon: '🛡️', description: 'Block next damage', cost: 1 },
+            mirror: { name: 'Mirror', icon: '🪞', description: 'Reflect damage to dealer', cost: 1 },
+            coin: { name: 'Lucky Coin', icon: '🪙', description: '50% chance double payout', cost: 1 },
+            flashlight: { name: 'Flashlight', icon: '🔦', description: 'Reveal next 2 shells', cost: 1 },
+            radio: { name: 'Radio', icon: '📻', description: 'Remove 1 live shell from stack', cost: 1 },
+            chainsaw: { name: 'Chainsaw', icon: '🪚', description: 'Triple damage for 1 shot', cost: 1 },
+            medkit: { name: 'Medkit', icon: '🧰', description: 'Heal all charges', cost: 1 },
+            smoke: { name: 'Smoke Bomb', icon: '💨', description: 'Skip dealer turn', cost: 1 },
+            magnet: { name: 'Magnet', icon: '🧲', description: 'Move shell to end', cost: 1 },
+            battery: { name: 'Battery', icon: '🔋', description: 'Reveal random shell position', cost: 1 },
+            knife: { name: 'Knife', icon: '🔪', description: 'Deal 1 damage to self, 3 to opponent', cost: 1 },
+            armor: { name: 'Armor', icon: '🦺', description: 'Tank 1 hit completely', cost: 1 },
+            gps: { name: 'GPS', icon: '📍', description: 'Show all live shell positions', cost: 1 }
+        };
+        
+        const BASE_ITEMS = ['magnifyingGlass', 'beer', 'handcuffs', 'handSaw', 'cigarettes', 'pills'];
+        const ADVANCED_ITEMS = ['magnifyingGlass', 'beer', 'handcuffs', 'handSaw', 'cigarettes', 'pills', 'inverter', 'adrenaline', 'burnerPhone', 'expiredMedicine'];
+        const BONUS_ITEMS = ['magnifyingGlass', 'beer', 'handcuffs', 'handSaw', 'cigarettes', 'pills', 'inverter', 'adrenaline', 'burnerPhone', 'expiredMedicine', 'bandage', 'dynamite', 'shield', 'mirror', 'flashlight', 'radio', 'chainsaw', 'medkit', 'smoke', 'magnet', 'battery', 'knife', 'armor', 'gps'];
+        
+        const ROUND_CONFIG = [
+            { charges: 2, shells: { live: 2, blank: 2 }, items: [], payout: 2 },
+            { charges: 2, shells: { live: 2, blank: 3 }, items: [], payout: 2 },
+            { charges: 3, shells: { live: 3, blank: 3 }, items: BASE_ITEMS, payout: 2.5 },
+            { charges: 3, shells: { live: 3, blank: 4 }, items: BASE_ITEMS, payout: 2.5 },
+            { charges: 4, shells: { live: 3, blank: 3 }, items: BASE_ITEMS, payout: 3 },
+            { charges: 4, shells: { live: 4, blank: 4 }, items: ADVANCED_ITEMS, payout: 3 },
+            { charges: 5, shells: { live: 4, blank: 4 }, items: ADVANCED_ITEMS, payout: 3.5 },
+            { charges: 5, shells: { live: 5, blank: 5 }, items: ADVANCED_ITEMS, payout: 3.5 },
+            { charges: 6, shells: { live: 5, blank: 5 }, items: ADVANCED_ITEMS, payout: 4 },
+            { charges: 6, shells: { live: 6, blank: 6 }, items: ADVANCED_ITEMS, payout: 4 },
+            // Double or Nothing rounds (BONUS)
+            { charges: 7, shells: { live: 6, blank: 6 }, items: BONUS_ITEMS, payout: 5 },
+            { charges: 7, shells: { live: 7, blank: 7 }, items: BONUS_ITEMS, payout: 6 },
+            { charges: 8, shells: { live: 8, blank: 8 }, items: BONUS_ITEMS, payout: 7 }
+        ];
+        
+        function generateRandomShells(liveCount, blankCount) {
+            const total = liveCount + blankCount;
+            const shells = [];
+            
+            // Create array of all shell types
+            for (let i = 0; i < total; i++) {
+                shells.push(i < liveCount ? 'live' : 'blank');
+            }
+            
+            // Fisher-Yates shuffle - loop many times for true randomness
+            for (let shufflePass = 0; shufflePass < 10; shufflePass++) {
+                for (let i = shells.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    const temp = shells[i];
+                    shells[i] = shells[j];
+                    shells[j] = temp;
+                }
+            }
+            
+            return shells;
+        }
+        
+        let gameState = {
+            playerName: '',
+            bank: 50000,
+            currentBet: 0,
+            round: 0,
+            playerCharges: 0,
+            dealerCharges: 0,
+            shells: [],
+            currentIndex: 0,
+            playerItems: [],
+            dealerItems: [],
+            isPlayerTurn: true,
+            handSawActive: false,
+            handcuffsActive: false,
+            handcuffsUsed: false,
+            roundWon: false,
+            totalRounds: 10,
+            isDoubleOrNothing: false,
+            gameWon: false,
+            shieldActive: false,
+            mirrorActive: false,
+            chainsawActive: false,
+            smokeBombActive: false,
+            armorActive: false
+        };
+        
+        function updateBankDisplays() {
+            document.getElementById('title-bank').textContent = gameState.bank.toLocaleString();
+            document.getElementById('betting-bank').textContent = gameState.bank.toLocaleString();
+            document.getElementById('transition-bank').textContent = gameState.bank.toLocaleString();
+            document.getElementById('final-bank').textContent = `Bank: $${gameState.bank.toLocaleString()}`;
+        }
+        
+        function goToBetting() {
+            // Save player name if provided (optional)
+            const signature = document.getElementById('player-signature').value.trim();
+            if (signature && !gameState.playerName) {
+                gameState.playerName = signature;
+            }
+            
+            document.getElementById('title-screen').style.display = 'none';
+            document.getElementById('round-transition').style.display = 'none';
+            document.getElementById('betting-screen').style.display = 'flex';
+            
+            const config = ROUND_CONFIG[gameState.round];
+            const totalRounds = gameState.isDoubleOrNothing ? 3 : 10;
+            document.getElementById('bet-round-num').textContent = gameState.round + 1;
+            document.getElementById('total-rounds').textContent = totalRounds;
+            document.getElementById('payout-rate').textContent = config.payout + 'x';
+            document.getElementById('current-bet').textContent = gameState.currentBet.toLocaleString();
+            document.getElementById('bet-input').value = gameState.currentBet > 0 ? gameState.currentBet : 1000;
+            document.getElementById('bet-error').textContent = '';
+        }
+        
+        function setBet(amount) {
+            const input = document.getElementById('bet-input');
+            let newBet = parseInt(input.value) + amount;
+            if (newBet < 100) newBet = 100;
+            if (newBet > gameState.bank) newBet = gameState.bank;
+            input.value = newBet;
+        }
+        
+        function halfBet() {
+            const input = document.getElementById('bet-input');
+            input.value = Math.floor(parseInt(input.value) / 2);
+            if (parseInt(input.value) < 100) input.value = 100;
+        }
+        
+        function maxBet() {
+            document.getElementById('bet-input').value = gameState.bank;
+        }
+        
+        function startRound() {
+            const bet = parseInt(document.getElementById('bet-input').value);
+            const errorDiv = document.getElementById('bet-error');
+            
+            if (isNaN(bet) || bet < 100) {
+                errorDiv.textContent = 'Minimum bet is $100';
+                return;
+            }
+            
+            if (bet > gameState.bank) {
+                errorDiv.textContent = 'Insufficient funds!';
+                return;
+            }
+            
+            gameState.currentBet = bet;
+            gameState.bank -= bet;
+            updateBankDisplays();
+            
+            document.getElementById('betting-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            document.getElementById('log').innerHTML = '';
+            initRound(gameState.round);
+        }
+        
+        function shuffle(array) {
+            // Fisher-Yates shuffle
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+            return array;
+        }
+        
+        function initRound(roundNum) {
+            const config = ROUND_CONFIG[roundNum];
+            gameState.round = roundNum;
+            gameState.playerCharges = config.charges;
+            gameState.dealerCharges = config.charges;
+            gameState.currentIndex = 0;
+            gameState.handSawActive = false;
+            gameState.handcuffsActive = false;
+            gameState.handcuffsUsed = false;
+            gameState.roundWon = false;
+            
+            gameState.shells = generateRandomShells(config.shells.live, config.shells.blank);
+            
+            gameState.playerItems = [];
+            gameState.dealerItems = [];
+            
+            if (roundNum > 0) {
+                const playerItemCount = roundNum === 1 ? 2 : 3;
+                const dealerItemCount = roundNum === 1 ? 2 : 3;
+                
+                for (let i = 0; i < playerItemCount; i++) {
+                    const itemKey = config.items[Math.floor(Math.random() * config.items.length)];
+                    gameState.playerItems.push({ ...ITEMS[itemKey], key: itemKey, used: false });
+                }
+                
+                for (let i = 0; i < dealerItemCount; i++) {
+                    const itemKey = config.items[Math.floor(Math.random() * config.items.length)];
+                    gameState.dealerItems.push({ ...ITEMS[itemKey], key: itemKey, used: false });
+                }
+            }
+            
+            gameState.isPlayerTurn = true;
+            
+            updateUI();
+            log(`Round ${roundNum + 1} begins! ${config.shells.live} live, ${config.shells.blank} blank shells loaded.`);
+            log(`Current bet: $${gameState.currentBet.toLocaleString()} (${config.payout}x payout)`);
+        }
+        
+        function updateUI() {
+            document.getElementById('round-display').textContent = `Round ${gameState.round + 1}`;
+            
+            const blanks = gameState.shells.filter(s => s === 'blank').length;
+            const lives = gameState.shells.filter(s => s === 'live').length;
+            document.getElementById('blank-count').textContent = blanks;
+            document.getElementById('live-count').textContent = lives;
+            
+            renderShells();
+            renderCharges();
+            renderItems();
+            renderDealerItems();
+            updateShotgunChamber();
+            
+            document.getElementById('player-area').classList.toggle('active', gameState.isPlayerTurn);
+            document.getElementById('dealer-area').classList.toggle('active', !gameState.isPlayerTurn);
+            
+            document.getElementById('shoot-dealer-btn').disabled = !gameState.isPlayerTurn;
+            document.getElementById('shoot-self-btn').disabled = !gameState.isPlayerTurn;
+        }
+        
+        function renderShells() {
+            const container = document.getElementById('shell-display');
+            container.innerHTML = '';
+            
+            gameState.shells.forEach((shell, index) => {
+                const div = document.createElement('div');
+                div.className = 'shell';
+                if (index < gameState.currentIndex) div.classList.add('fired');
+                if (index === gameState.currentIndex) div.classList.add('current');
+                div.textContent = index + 1;
+                container.appendChild(div);
+            });
+        }
+        
+        function renderCharges() {
+            const playerContainer = document.getElementById('player-charges');
+            const dealerContainer = document.getElementById('dealer-charges');
+            
+            playerContainer.innerHTML = '';
+            dealerContainer.innerHTML = '';
+            
+            for (let i = 0; i < ROUND_CONFIG[gameState.round].charges; i++) {
+                const playerCharge = document.createElement('div');
+                playerCharge.className = 'charge' + (i >= gameState.playerCharges ? ' lost' : '');
+                playerContainer.appendChild(playerCharge);
+                
+                const dealerCharge = document.createElement('div');
+                dealerCharge.className = 'charge' + (i >= gameState.dealerCharges ? ' lost' : '');
+                dealerContainer.appendChild(dealerCharge);
+            }
+        }
+        
+        function renderItems() {
+            const container = document.getElementById('items-container');
+            container.innerHTML = '';
+            
+            gameState.playerItems.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'item' + (item.used ? ' used' : '');
+                btn.textContent = `${item.icon} ${item.name}`;
+                btn.onclick = () => useItem(index);
+                if (item.used || !gameState.isPlayerTurn) btn.disabled = true;
+                container.appendChild(btn);
+            });
+        }
+        
+        function renderDealerItems() {
+            const container = document.getElementById('dealer-items');
+            container.innerHTML = '';
+            
+            gameState.dealerItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'dealer-item';
+                div.textContent = item.icon;
+                div.title = item.name;
+                container.appendChild(div);
+            });
+        }
+        
+        function updateShotgunChamber() {
+            const chamber = document.getElementById('shotgun-chamber');
+            if (gameState.currentIndex < gameState.shells.length) {
+                const shell = gameState.shells[gameState.currentIndex];
+                chamber.innerHTML = `<div class="shell ${shell}"></div>`;
+            } else {
+                chamber.innerHTML = '';
+            }
+        }
+        
+        function log(message, type = '') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = message;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function setMessage(msg, type = '') {
+            const msgDiv = document.getElementById('message');
+            msgDiv.textContent = msg;
+            msgDiv.className = type;
+        }
+        
+        function fireEffect() {
+            const flash = document.getElementById('screen-flash');
+            flash.classList.remove('fire');
+            void flash.offsetWidth;
+            flash.classList.add('fire');
+            
+            document.getElementById('game-container').classList.add('shake');
+            setTimeout(() => {
+                document.getElementById('game-container').classList.remove('shake');
+            }, 500);
+        }
+        
+        function shoot(target, shooter) {
+            if (gameState.currentIndex >= gameState.shells.length) {
+                handleRoundEnd(true);
+                return;
+            }
+            
+            fireEffect();
+            
+            let shell = gameState.shells[gameState.currentIndex];
+            
+            if (gameState.handSawActive && shell === 'live') {
+                shell = 'live';
+            }
+            
+            gameState.currentIndex++;
+            updateShotgunChamber();
+            
+            const isPlayerShooter = (shooter === 'player');
+            const isPlayerTarget = (target === 'self' && isPlayerShooter) || (target === 'dealer' && !isPlayerShooter);
+            
+            if (shell === 'blank') {
+                log(`*CLICK* ... a blank!`, 'blank');
+                
+                if (target === 'self') {
+                    // Someone shot themselves
+                    setMessage('Blank! You keep your turn!', 'success');
+                    
+                    if (isPlayerShooter) {
+                        // Player shot themselves - player keeps turn
+                        gameState.isPlayerTurn = true;
+                    } else {
+                        // Dealer shot themselves - dealer keeps turn
+                        gameState.isPlayerTurn = false;
+                        setTimeout(dealerTurn, 1000);
+                    }
+                } else {
+                    // Someone shot the other player
+                    setMessage('Blank! The dealer survives.', '');
+                    
+                    if (isPlayerShooter) {
+                        // Player shot dealer - dealer's turn
+                        gameState.isPlayerTurn = false;
+                        setTimeout(dealerTurn, 1000);
+                    } else {
+                        // Dealer shot player - player's turn
+                        gameState.isPlayerTurn = true;
+                    }
+                }
+            } else {
+                // Live shell - apply damage
+                let damage = gameState.handSawActive ? 2 : 1;
+                if (gameState.chainsawActive) damage = 3;
+                
+                // Handle shield (blocks damage completely)
+                if ((target === 'self' && isPlayerShooter && gameState.shieldActive) ||
+                    (target !== 'self' && !isPlayerShooter && gameState.shieldActive)) {
+                    gameState.shieldActive = false;
+                    log('SHIELD blocked the damage!', 'success');
+                    setMessage('SHIELD blocked the hit!', 'success');
+                    gameState.handSawActive = false;
+                    gameState.chainsawActive = false;
+                    updateUI();
+                    return;
+                }
+                
+                // Handle armor (blocks 1 hit completely)
+                if ((target === 'self' && isPlayerShooter && gameState.armorActive) ||
+                    (target !== 'self' && !isPlayerShooter && gameState.armorActive)) {
+                    gameState.armorActive = false;
+                    log('ARMOR blocked the damage!', 'success');
+                    setMessage('ARMOR blocked the hit!', 'success');
+                    gameState.handSawActive = false;
+                    gameState.chainsawActive = false;
+                    updateUI();
+                    return;
+                }
+                
+                // Handle mirror (reflects damage to dealer when player shoots self)
+                if (target === 'self' && isPlayerShooter && gameState.mirrorActive) {
+                    gameState.mirrorActive = false;
+                    gameState.dealerCharges -= damage;
+                    log(`MIRROR! Damage reflected to dealer: ${damage}!`, 'warning');
+                    setMessage(`MIRROR reflected ${damage} to dealer!`, 'success');
+                    
+                    if (gameState.dealerCharges <= 0) {
+                        gameState.handSawActive = false;
+                        gameState.chainsawActive = false;
+                        handleRoundEnd(true);
+                        return;
+                    }
+                } else if (target === 'self') {
+                    // Someone shot themselves
+                    if (isPlayerShooter) {
+                        gameState.playerCharges -= damage;
+                        log(`BOOM! You took ${damage} damage!`, 'damage');
+                        setMessage(`Live shell! You took ${damage} damage!`, 'error');
+                        
+                        if (gameState.playerCharges <= 0) {
+                            handleRoundEnd(false);
+                            return;
+                        }
+                        gameState.isPlayerTurn = true;
+                    } else {
+                        gameState.dealerCharges -= damage;
+                        log(`BOOM! Dealer took ${damage} damage!`, 'damage');
+                        setMessage(`Live shell! Dealer took ${damage} damage!`, 'success');
+                        
+                        if (gameState.dealerCharges <= 0) {
+                            handleRoundEnd(true);
+                            return;
+                        }
+                        gameState.isPlayerTurn = false;
+                        setTimeout(dealerTurn, 1000);
+                    }
+                } else {
+                    // Someone shot the other player
+                    if (isPlayerShooter) {
+                        gameState.dealerCharges -= damage;
+                        log(`BOOM! Dealer took ${damage} damage!`, 'damage');
+                        setMessage(`Live shell! Dealer took ${damage} damage!`, 'success');
+                        
+                        if (gameState.dealerCharges <= 0) {
+                            handleRoundEnd(true);
+                            return;
+                        }
+                        gameState.isPlayerTurn = false;
+                        setTimeout(dealerTurn, 1000);
+                    } else {
+                        gameState.playerCharges -= damage;
+                        log(`BOOM! You took ${damage} damage!`, 'damage');
+                        setMessage(`Live shell! You took ${damage} damage!`, 'error');
+                        
+                        if (gameState.playerCharges <= 0) {
+                            handleRoundEnd(false);
+                            return;
+                        }
+                        gameState.isPlayerTurn = true;
+                    }
+                }
+            }
+            
+            gameState.handSawActive = false;
+            updateUI();
+            
+            if (gameState.currentIndex >= gameState.shells.length) {
+                setTimeout(() => {
+                    handleRoundEnd(null);
+                }, 1500);
+            }
+        }
+        
+        function handleRoundEnd(result) {
+            if (result === true) {
+                gameState.roundWon = true;
+                const payout = gameState.currentBet * ROUND_CONFIG[gameState.round].payout;
+                gameState.bank += payout;
+                log(`You won! +$${payout.toLocaleString()}`);
+            } else if (result === false) {
+                gameState.roundWon = false;
+                log(`You lost! -$${gameState.currentBet.toLocaleString()}`);
+            } else {
+                gameState.roundWon = null;
+                log(`Both survived! Shotgun empty. Moving to next round...`);
+                gameState.bank += gameState.currentBet;
+            }
+            
+            gameState.currentBet = 0;
+            updateBankDisplays();
+            
+            setTimeout(() => {
+                showRoundTransition(result);
+            }, 1000);
+        }
+        
+        function showRoundTransition(result) {
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('round-transition').style.display = 'flex';
+            
+            const title = document.getElementById('transition-title');
+            const message = document.getElementById('transition-message');
+            
+            if (result === true) {
+                title.textContent = 'Round Won!';
+                title.style.color = 'var(--neon-green)';
+                message.textContent = 'The dealer is dead. You collected your winnings!';
+                
+                if (gameState.round >= gameState.totalRounds - 1) {
+                    if (!gameState.isDoubleOrNothing) {
+                        showDoubleOrNothingButton();
+                    } else {
+                        message.textContent = 'DOUBLE OR NOTHING COMPLETE! You won everything!';
+                    }
+                }
+            } else if (result === false) {
+                title.textContent = 'Round Lost';
+                title.style.color = 'var(--neon-red)';
+                message.textContent = 'You died. Better luck next time.';
+                
+                if (gameState.bank < 100) {
+                    message.textContent = 'You\'re broke! Game over.';
+                    document.querySelector('#round-transition .menu-btn').textContent = 'Game Over';
+                    document.querySelector('#round-transition .menu-btn').onclick = () => {
+                        gameState.bank = 50000;
+                        gameState.round = 0;
+                        gameState.currentBet = 0;
+                        gameState.isDoubleOrNothing = false;
+                        gameState.gameWon = false;
+                        updateBankDisplays();
+                        returnToTitle();
+                    };
+                }
+            } else {
+                // Draw - both survived
+                gameState.round++;
+                
+                if (gameState.round >= gameState.totalRounds) {
+                    if (!gameState.isDoubleOrNothing) {
+                        showDoubleOrNothingButton();
+                    } else {
+                        gameState.gameWon = true;
+                        title.textContent = 'Victory!';
+                        title.style.color = 'var(--neon-green)';
+                        message.textContent = `You won everything! Final bank: $${gameState.bank.toLocaleString()}`;
+                        document.querySelector('#round-transition .menu-btn').textContent = 'New Game';
+                        document.querySelector('#round-transition .menu-btn').onclick = () => {
+                            gameState.round = 0;
+                            gameState.currentBet = 0;
+                            gameState.isDoubleOrNothing = false;
+                            gameState.gameWon = false;
+                            goToBetting();
+                        };
+                    }
+                } else {
+                    title.textContent = 'Both Survived!';
+                    title.style.color = 'var(--gold)';
+                    if (gameState.isDoubleOrNothing) {
+                        message.textContent = `Both survived! Moving to BONUS Round ${gameState.round - 9}...`;
+                    } else {
+                        message.textContent = `Both survived! Moving to Round ${gameState.round + 1}...`;
+                    }
+                }
+            }
+        }
+        
+        function showDoubleOrNothingButton() {
+            const title = document.getElementById('transition-title');
+            const message = document.getElementById('transition-message');
+            
+            title.textContent = 'Main Game Complete!';
+            title.style.color = 'var(--gold)';
+            message.innerHTML = `<div style="font-size: 1.5rem; margin: 20px 0;">Current Bank: $${gameState.bank.toLocaleString()}</div>
+                <div style="color: #888; margin-bottom: 20px;">You can keep your winnings or risk them all in Double or Nothing!</div>`;
+            
+            const btn = document.querySelector('#round-transition .menu-btn');
+            btn.textContent = 'Take Money & Quit';
+            btn.onclick = () => {
+                gameState.round = 0;
+                gameState.currentBet = 0;
+                gameState.isDoubleOrNothing = false;
+                gameState.gameWon = false;
+                returnToTitle();
+            };
+            
+            const continueBtn = document.createElement('button');
+            continueBtn.className = 'menu-btn primary';
+            continueBtn.textContent = 'Double or Nothing!';
+            continueBtn.style.marginTop = '20px';
+            continueBtn.onclick = () => {
+                gameState.isDoubleOrNothing = true;
+                gameState.round = 10;
+                goToBetting();
+            };
+            document.getElementById('round-transition').appendChild(continueBtn);
+        }
+        
+        function shootDealer() {
+            if (!gameState.isPlayerTurn) return;
+            log('You aim at the dealer...');
+            shoot('dealer', 'player');
+        }
+        
+        function shootSelf() {
+            if (!gameState.isPlayerTurn) return;
+            log('You aim at yourself...');
+            shoot('self', 'player');
+        }
+        
+        function useItem(index) {
+            const item = gameState.playerItems[index];
+            if (item.used || !gameState.isPlayerTurn) return;
+            
+            switch (item.key) {
+                case 'magnifyingGlass':
+                    if (gameState.currentIndex < gameState.shells.length) {
+                        const currentShell = gameState.shells[gameState.currentIndex];
+                        setMessage(`The shell in chamber is: ${currentShell.toUpperCase()}!`, currentShell === 'live' ? 'error' : 'success');
+                        log(`You examine the shell: ${currentShell}`);
+                    }
+                    break;
+                    
+                case 'beer':
+                    if (gameState.currentIndex < gameState.shells.length) {
+                        const ejected = gameState.shells[gameState.currentIndex];
+                        gameState.shells.splice(gameState.currentIndex, 1);
+                        log(`You chug the beer and rack the shotgun! Ejected: ${ejected}`);
+                        setMessage(`Ejected a ${ejected} shell!`, 'success');
+                    }
+                    break;
+                    
+                case 'handcuffs':
+                    gameState.handcuffsActive = true;
+                    log('You cuff the dealer! They will skip their next turn.');
+                    setMessage('Handcuffs applied!', 'success');
+                    break;
+                    
+                case 'handSaw':
+                    gameState.handSawActive = true;
+                    log('You attach the hand saw! Next live shell does double damage.');
+                    setMessage('Hand Saw active!', 'success');
+                    break;
+                    
+                case 'cigarettes':
+                    if (gameState.playerCharges < ROUND_CONFIG[gameState.round].charges) {
+                        gameState.playerCharges++;
+                        log('You smoke a cigarette. +1 charge!');
+                        setMessage('Healed 1 charge!', 'success');
+                    } else {
+                        setMessage('Already at max charges!', '');
+                    }
+                    break;
+                    
+                case 'pills':
+                    showPillsGame();
+                    break;
+                    
+                case 'inverter':
+                    if (gameState.currentIndex < gameState.shells.length) {
+                        gameState.shells[gameState.currentIndex] = gameState.shells[gameState.currentIndex] === 'live' ? 'blank' : 'live';
+                        log('You used the inverter! Shell polarity reversed!');
+                        setMessage('Shell reversed!', 'success');
+                        updateShotgunChamber();
+                    }
+                    break;
+                    
+                case 'adrenaline':
+                    if (gameState.dealerItems.length > 0) {
+                        const stolenIndex = Math.floor(Math.random() * gameState.dealerItems.length);
+                        const stolenItem = gameState.dealerItems[stolenIndex];
+                        gameState.playerItems.push({ ...stolenItem, used: false });
+                        gameState.dealerItems.splice(stolenIndex, 1);
+                        log(`You stole and used: ${stolenItem.name}!`);
+                        setMessage(`Stole ${stolenItem.name}!`, 'success');
+                    }
+                    break;
+                    
+                case 'burnerPhone':
+                    if (gameState.currentIndex < gameState.shells.length - 1) {
+                        const randomIndex = gameState.currentIndex + Math.floor(Math.random() * (gameState.shells.length - gameState.currentIndex - 1)) + 1;
+                        const revealedShell = gameState.shells[randomIndex];
+                        log(`Phone reveals shell #${randomIndex + 1} is ${revealedShell}!`);
+                        setMessage(`Shell #${randomIndex + 1}: ${revealedShell.toUpperCase()}`, revealedShell === 'live' ? 'error' : 'success');
+                    }
+                    break;
+                    
+                case 'expiredMedicine':
+                    const roll = Math.random();
+                    if (roll < 0.4) {
+                        gameState.playerCharges = Math.min(gameState.playerCharges + 2, ROUND_CONFIG[gameState.round].charges);
+                        log('Medicine worked! +2 charges!');
+                        setMessage('Healed 2 charges!', 'success');
+                    } else {
+                        gameState.playerCharges = Math.max(0, gameState.playerCharges - 1);
+                        log('Medicine made you worse! -1 charge!');
+                        setMessage('Lost 1 charge!', 'error');
+                    }
+                    break;
+                    
+                // NEW ITEMS
+                case 'bandage':
+                    gameState.playerCharges = Math.min(gameState.playerCharges + 2, ROUND_CONFIG[gameState.round].charges);
+                    log('Used bandage! +2 charges!');
+                    setMessage('Healed 2 charges!', 'success');
+                    break;
+                    
+                case 'syringe':
+                    gameState.playerCharges = ROUND_CONFIG[gameState.round].charges;
+                    log('Used syringe! Fully healed!');
+                    setMessage('Fully healed!', 'success');
+                    break;
+                    
+                case 'dynamite':
+                    gameState.currentIndex = Math.min(gameState.currentIndex + 3, gameState.shells.length);
+                    log('Used dynamite! Skipped 3 shells!');
+                    setMessage('Skipped 3 shells!', 'success');
+                    updateShotgunChamber();
+                    break;
+                    
+                case 'shield':
+                    gameState.shieldActive = true;
+                    log('Shield equipped! Next hit will be blocked!');
+                    setMessage('Shield active!', 'success');
+                    break;
+                    
+                case 'mirror':
+                    gameState.mirrorActive = true;
+                    log('Mirror equipped! Next damage reflects to dealer!');
+                    setMessage('Mirror active!', 'success');
+                    break;
+                    
+                case 'coin':
+                    if (Math.random() > 0.5) {
+                        const coinPayout = gameState.currentBet * ROUND_CONFIG[gameState.round].payout;
+                        gameState.bank += coinPayout;
+                        log('Lucky coin! Doubled payout!');
+                        setMessage('LUCKY! Doubled winnings!', 'success');
+                    } else {
+                        log('Coin flip failed...');
+                        setMessage('Coin flip failed', '');
+                    }
+                    break;
+                    
+                case 'flashlight':
+                    if (gameState.currentIndex < gameState.shells.length - 1) {
+                        const s1 = gameState.shells[gameState.currentIndex];
+                        const s2 = gameState.shells[gameState.currentIndex + 1];
+                        log(`Flashlight reveals: Shell 1: ${s1}, Shell 2: ${s2}`);
+                        setMessage(`Next 2: ${s1.toUpperCase()}, ${s2.toUpperCase()}`, s1 === 'live' || s2 === 'live' ? 'error' : 'success');
+                    }
+                    break;
+                    
+                case 'radio':
+                    const liveIdx = gameState.shells.slice(gameState.currentIndex).findIndex(s => s === 'live');
+                    if (liveIdx !== -1) {
+                        gameState.shells.splice(gameState.currentIndex + liveIdx, 1);
+                        log('Radio removed a live shell from the stack!');
+                        setMessage('Live shell removed!', 'success');
+                    }
+                    break;
+                    
+                case 'chainsaw':
+                    gameState.chainsawActive = true;
+                    log('Chainsaw equipped! Next live does TRIPLE damage!');
+                    setMessage('CHAINSAW ACTIVATE! 3x damage!', 'warning');
+                    break;
+                    
+                case 'medkit':
+                    gameState.playerCharges = ROUND_CONFIG[gameState.round].charges;
+                    log('Medkit used! All charges restored!');
+                    setMessage('FULL HEAL!', 'success');
+                    break;
+                    
+                case 'smoke':
+                    gameState.smokeBombActive = true;
+                    log('Smoke bomb! Dealer skips turn!');
+                    setMessage('Smoke bomb! Dealer blinded!', 'success');
+                    break;
+                    
+                case 'magnet':
+                    if (gameState.currentIndex < gameState.shells.length - 1) {
+                        const lastIdx = gameState.shells.length - 1;
+                        const temp = gameState.shells[gameState.currentIndex];
+                        gameState.shells[gameState.currentIndex] = gameState.shells[lastIdx];
+                        gameState.shells[lastIdx] = temp;
+                        log('Magnet moved current shell to end!');
+                        setMessage('Shell moved to end!', 'success');
+                    }
+                    break;
+                    
+                case 'battery':
+                    const randIdx = Math.floor(Math.random() * gameState.shells.length);
+                    const randShell = gameState.shells[randIdx];
+                    log(`Battery reveals: Shell #${randIdx + 1} is ${randShell}!`);
+                    setMessage(`Shell #${randIdx + 1}: ${randShell.toUpperCase()}`, randShell === 'live' ? 'error' : 'success');
+                    break;
+                    
+                case 'knife':
+                    gameState.playerCharges = Math.max(0, gameState.playerCharges - 1);
+                    gameState.dealerCharges = Math.max(0, gameState.dealerCharges - 3);
+                    log('Used knife! -1 to you, -3 to dealer!');
+                    setMessage('KnifeSlash! -1 You, -3 Dealer!', 'warning');
+                    break;
+                    
+                case 'armor':
+                    gameState.armorActive = true;
+                    log('Armor equipped! One hit blocked!');
+                    setMessage('ARMOR ACTIVE!', 'success');
+                    break;
+                    
+                case 'gps':
+                    const livePositions = [];
+                    gameState.shells.forEach((s, i) => { if (s === 'live' && i >= gameState.currentIndex) livePositions.push(i + 1); });
+                    log(`GPS shows LIVE shells at positions: ${livePositions.join(', ')}`);
+                    setMessage(`Live shells at: ${livePositions.join(', ')}`, 'warning');
+                    break;
+            }
+            
+            item.used = true;
+            updateUI();
+        }
+        
+        function showPillsGame() {
+            const modal = document.getElementById('pills-modal');
+            const shellsContainer = document.getElementById('pills-shells');
+            shellsContainer.innerHTML = '';
+            
+            const pillsShells = shuffle(['live', 'blank', 'blank']);
+            
+            pillsShells.forEach(shell => {
+                const div = document.createElement('div');
+                div.className = 'pills-shell';
+                div.dataset.type = shell;
+                shellsContainer.appendChild(div);
+            });
+            
+            modal.style.display = 'flex';
+        }
+        
+        function playPills() {
+            const shells = document.querySelectorAll('.pills-shell');
+            let liveFound = false;
+            
+            shells.forEach((shell, index) => {
+                if (shell.dataset.type === 'live') {
+                    shell.classList.add('revealed', 'live');
+                    liveFound = true;
+                } else {
+                    shell.classList.add('revealed', 'blank');
+                }
+            });
+            
+            if (liveFound) {
+                gameState.playerCharges = Math.max(0, gameState.playerCharges - 1);
+                document.getElementById('pills-message').textContent = 'You lost! -1 charge';
+                document.getElementById('pills-message').style.color = 'var(--neon-red)';
+            } else {
+                gameState.playerItems.push({ ...ITEMS.inverter, key: 'inverter', used: false });
+                gameState.playerItems.push({ ...ITEMS.adrenaline, key: 'adrenaline', used: false });
+                gameState.playerItems.push({ ...ITEMS.burnerPhone, key: 'burnerPhone', used: false });
+                gameState.playerItems.push({ ...ITEMS.expiredMedicine, key: 'expiredMedicine', used: false });
+                document.getElementById('pills-message').textContent = 'You won! 4 new items!';
+                document.getElementById('pills-message').style.color = 'var(--neon-green)';
+            }
+            
+            setTimeout(() => {
+                document.getElementById('pills-modal').style.display = 'none';
+                updateUI();
+            }, 1500);
+        }
+        
+        function skipPills() {
+            document.getElementById('pills-modal').style.display = 'none';
+        }
+        
+        function dealerTurn() {
+            if (gameState.handcuffsActive && !gameState.handcuffsUsed) {
+                log('Dealer is cuffed! Turn skipped.');
+                gameState.handcuffsUsed = true;
+                gameState.handcuffsActive = false;
+                gameState.isPlayerTurn = true;
+                updateUI();
+                return;
+            }
+            
+            const blanks = gameState.shells.slice(gameState.currentIndex).filter(s => s === 'blank').length;
+            const lives = gameState.shells.slice(gameState.currentIndex).filter(s => s === 'live').length;
+            const total = blanks + lives;
+            const blankChance = blanks / total;
+            
+            let action = 'shootSelf';
+            
+            if (lives > 0 && blankChance > 0.6) {
+                action = 'shootSelf';
+            } else if (gameState.dealerCharges <= 2 && lives > 0 && blankChance < 0.4) {
+                action = 'shootPlayer';
+            } else {
+                action = Math.random() > 0.5 ? 'shootPlayer' : 'shootSelf';
+            }
+            
+            const target = action === 'shootPlayer' ? 'player' : 'self';
+            const shooter = 'dealer';
+            log(`Dealer aims at ${target === 'player' ? 'you' : 'themselves'}...`);
+            
+            setTimeout(() => {
+                shoot(target, shooter);
+            }, 1000);
+        }
+        
+        function returnToTitle() {
+            gameState.round = 0;
+            gameState.currentBet = 0;
+            gameState.isDoubleOrNothing = false;
+            gameState.gameWon = false;
+            updateBankDisplays();
+            
+            // Show player name if they signed in
+            const nameDisplay = document.getElementById('player-name-display');
+            const rulesClipboard = document.getElementById('rules-clipboard');
+            const sigInput = document.getElementById('player-signature');
+            
+            if (gameState.playerName) {
+                nameDisplay.textContent = 'Welcome back, ' + gameState.playerName + '!';
+                nameDisplay.style.display = 'block';
+                document.getElementById('play-btn').textContent = 'Continue Game';
+            } else {
+                nameDisplay.style.display = 'none';
+                document.getElementById('play-btn').textContent = 'Play';
+            }
+            
+            // Always show rules clipboard
+            rulesClipboard.style.display = 'block';
+            sigInput.disabled = false;
+            sigInput.value = '';
+            
+            // Remove any extra buttons from round transition
+            const extraBtn = document.querySelector('#round-transition .menu-btn.primary');
+            if (extraBtn && extraBtn !== document.querySelector('#round-transition .menu-btn')) {
+                extraBtn.remove();
+            }
+            // Make sure only one continue button exists
+            const btns = document.querySelectorAll('#round-transition .menu-btn');
+            btns.forEach((btn, i) => {
+                if (i > 0) btn.remove();
+            });
+            
+            document.getElementById('title-screen').style.display = 'flex';
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('game-over').style.display = 'none';
+            document.getElementById('round-transition').style.display = 'none';
+            document.getElementById('betting-screen').style.display = 'none';
+            
+            const continueBtn = document.querySelector('#round-transition .menu-btn');
+            if (continueBtn) {
+                continueBtn.textContent = 'Continue';
+                continueBtn.onclick = goToBetting;
+            }
+        }
+        
+        updateBankDisplays();
+        
+        // Initialize button state based on existing player name
+        if (gameState.playerName) {
+            const playBtn = document.getElementById('play-btn');
+            playBtn.removeAttribute('disabled');
+            playBtn.style.opacity = '1';
+            playBtn.style.cursor = 'pointer';
+            const sigInput = document.getElementById('player-signature');
+            if (sigInput) {
+                sigInput.disabled = true;
+                sigInput.value = gameState.playerName + ' ✓';
+            }
+        }
+        
+        // Cheat Terminal System
+        const CHEATS = {
+            'help': { desc: 'Show all available cheats', func: () => showHelp() },
+            'bank': { desc: 'Show current bank balance', func: () => terminalOutput('Current Bank: $' + gameState.bank.toLocaleString(), 'info') },
+            'reveal': { desc: 'Reveal next shell type', func: () => revealNextShell() },
+            'revealall': { desc: 'Reveal all remaining shells', func: () => revealAllShells() },
+            'heal': { desc: 'Restore all player charges', func: () => healPlayer() },
+            'healfull': { desc: 'Full heal both players', func: () => fullHeal() },
+            'kill': { desc: 'Instantly kill the dealer', func: () => killDealer() },
+            'suicide': { desc: 'Kill yourself (game over)', func: () => killPlayer() },
+            'skip': { desc: 'Skip to next round', func: () => skipRound() },
+            'win': { desc: 'Win current round instantly', func: () => winRound() },
+            'lose': { desc: 'Lose current round instantly', func: () => loseRound() },
+            'money': { desc: 'Add $10,000 to bank', func: () => addMoney(10000) },
+            'bigmoney': { desc: 'Add $100,000 to bank', func: () => addMoney(100000) },
+            'items': { desc: 'Get all items', func: () => getAllItems() },
+            'infiniteammo': { desc: 'Never run out of shells', func: () => infiniteAmmo() },
+            'godmode': { desc: 'Cannot die this round', func: () => godMode() },
+            'seeitems': { desc: 'See dealer\'s items', func: () => seeDealerItems() },
+            'reroll': { desc: 'Reroll current shell', func: () => rerollShell() },
+            'nextlive': { desc: 'Make next shell live', func: () => makeNextLive() },
+            'nextblank': { desc: 'Make next shell blank', func: () => makeNextBlank() },
+            'clear': { desc: 'Clear terminal', func: () => clearTerminal() },
+            'exit': { desc: 'Close terminal', func: () => toggleTerminal() },
+            'round': { desc: 'Show current round number', func: () => terminalOutput('Current Round: ' + (gameState.round + 1) + ' / ' + (gameState.isDoubleOrNothing ? '3 BONUS' : '10'), 'info') },
+            'charges': { desc: 'Show current charges', func: () => terminalOutput('Player: ' + gameState.playerCharges + ' | Dealer: ' + gameState.dealerCharges, 'info') },
+            'shellsleft': { desc: 'Show remaining shells count', func: () => terminalOutput('Shells remaining: ' + (gameState.shells.length - gameState.currentIndex), 'info') },
+            'chargeup': { desc: 'Add +1 charge to player', func: () => { gameState.playerCharges++; updateUI(); terminalOutput('+1 charge added!', 'success'); } },
+            'chargeupdealer': { desc: 'Add +1 charge to dealer', func: () => { gameState.dealerCharges++; updateUI(); terminalOutput('+1 charge to dealer!', 'warning'); } },
+            'doublewin': { desc: 'Double current bet winnings', func: () => { const win = gameState.currentBet * ROUND_CONFIG[gameState.round].payout; gameState.bank += win; terminalOutput('Doubled to $' + win.toLocaleString() + '!', 'success'); } },
+            'stealitems': { desc: 'Steal all dealer items', func: () => { gameState.playerItems = gameState.playerItems.concat(gameState.dealerItems); gameState.dealerItems = []; updateUI(); terminalOutput('All dealer items stolen!', 'success'); } },
+            'removeitem': { desc: 'Remove random dealer item', func: () => { if (gameState.dealerItems.length > 0) { gameState.dealerItems.pop(); updateUI(); terminalOutput('Dealer item removed!', 'success'); } else { terminalOutput('Dealer has no items!', 'error'); } } },
+            'freeskip': { desc: 'Free skip (no ammo cost)', func: () => { gameState.shells.push('blank', 'blank'); updateUI(); terminalOutput('Free skip activated!', 'success'); } },
+            'shellcount': { desc: 'Show exact shell breakdown', func: () => { const rem = gameState.shells.slice(gameState.currentIndex); const l = rem.filter(s => s === 'live').length; const b = rem.filter(s => s === 'blank').length; terminalOutput('Remaining: ' + l + ' LIVE, ' + b + ' BLANK', 'info'); } },
+            'maxbet': { desc: 'Set bet to max (bank)', func: () => { document.getElementById('bet-input').value = gameState.bank; terminalOutput('Max bet set!', 'info'); } },
+            'half': { desc: 'Half current bet', func: () => { document.getElementById('bet-input').value = Math.floor(parseInt(document.getElementById('bet-input').value || gameState.currentBet) / 2); terminalOutput('Bet halved!', 'info'); } },
+            'allin': { desc: 'Go all in with full bank', func: () => { document.getElementById('bet-input').value = gameState.bank; terminalOutput('ALL IN!', 'warning'); } },
+            'bomb': { desc: 'Explode current shell (live)', func: () => { if (gameState.currentIndex < gameState.shells.length) { gameState.shells[gameState.currentIndex] = 'live'; terminalOutput('Shell set to LIVE!', 'warning'); } } },
+            'peace': { desc: 'Make all remaining shells blank', func: () => { for (let i = gameState.currentIndex; i < gameState.shells.length; i++) gameState.shells[i] = 'blank'; terminalOutput('All remaining shells are BLANK!', 'success'); } },
+            'chaos': { desc: 'Make all remaining shells live', func: () => { for (let i = gameState.currentIndex; i < gameState.shells.length; i++) gameState.shells[i] = 'live'; terminalOutput('All remaining shells are LIVE!', 'warning'); } },
+            'swap': { desc: 'Swap player and dealer charges', func: () => { const temp = gameState.playerCharges; gameState.playerCharges = gameState.dealerCharges; gameState.dealerCharges = temp; updateUI(); terminalOutput('Charges swapped!', 'info'); } },
+            'freeze': { desc: 'Freeze dealer (skip turn)', func: () => { gameState.handcuffsActive = true; terminalOutput('Dealer frozen for one turn!', 'success'); } },
+            'unfreeze': { desc: 'Unfreeze dealer', func: () => { gameState.handcuffsActive = false; gameState.handcuffsUsed = true; terminalOutput('Dealer unfrozen!', 'info'); } },
+            'magnify': { desc: 'Get magnifying glass effect', func: () => revealNextShell() },
+            'beer': { desc: 'Get beer effect (eject shell)', func: () => { if (gameState.currentIndex < gameState.shells.length) { const e = gameState.shells.splice(gameState.currentIndex, 1)[0]; terminalOutput('Ejected: ' + e.toUpperCase(), 'info'); } } },
+            'saw': { desc: 'Activate hand saw (2x damage)', func: () => { gameState.handSawActive = true; terminalOutput('Hand Saw ACTIVATED!', 'warning'); } },
+            'cig': { desc: 'Heal with cigarettes', func: () => { if (gameState.playerCharges < ROUND_CONFIG[gameState.round].charges) { gameState.playerCharges++; updateUI(); terminalOutput('+1 charge (cigarette)', 'success'); } else { terminalOutput('Already at max!', 'info'); } } },
+            'pills': { desc: 'Play pills minigame', func: () => showPillsGame() },
+            'invert': { desc: 'Invert current shell', func: () => { if (gameState.currentIndex < gameState.shells.length) { gameState.shells[gameState.currentIndex] = gameState.shells[gameState.currentIndex] === 'live' ? 'blank' : 'live'; terminalOutput('Shell inverted!', 'info'); } } },
+            'adrenaline': { desc: 'Use adrenaline (steal item)', func: () => { if (gameState.dealerItems.length > 0) { const idx = Math.floor(Math.random() * gameState.dealerItems.length); gameState.playerItems.push(gameState.dealerItems[idx]); gameState.dealerItems.splice(idx, 1); updateUI(); terminalOutput('Stole: ' + gameState.playerItems[gameState.playerItems.length - 1].name, 'success'); } else { terminalOutput('No items to steal!', 'error'); } } },
+            'phone': { desc: 'Use burner phone', func: () => { if (gameState.currentIndex < gameState.shells.length - 1) { const idx = gameState.currentIndex + Math.floor(Math.random() * (gameState.shells.length - gameState.currentIndex - 1)) + 1; terminalOutput('Shell #' + (idx + 1) + ' is: ' + gameState.shells[idx].toUpperCase(), 'info'); } else { terminalOutput('No shells to check!', 'error'); } } },
+            'meds': { desc: 'Use expired medicine', func: () => { const roll = Math.random(); if (roll < 0.4) { gameState.playerCharges = Math.min(gameState.playerCharges + 2, ROUND_CONFIG[gameState.round].charges); terminalOutput('Medicine worked! +2 charges!', 'success'); } else { gameState.playerCharges = Math.max(0, gameState.playerCharges - 1); terminalOutput('Medicine failed! -1 charge!', 'error'); } updateUI(); } },
+            'restart': { desc: 'Restart from round 1', func: () => { gameState.round = 0; gameState.currentBet = 0; gameState.isDoubleOrNothing = false; gameState.gameWon = false; terminalOutput('Game restarted from round 1!', 'info'); goToBetting(); } },
+            'status': { desc: 'Show full game status', func: () => { terminalOutput('=== GAME STATUS ===', 'info'); terminalOutput('Bank: $' + gameState.bank.toLocaleString(), 'info'); terminalOutput('Round: ' + (gameState.round + 1) + (gameState.isDoubleOrNothing ? ' (BONUS)' : ''), 'info'); terminalOutput('Bet: $' + gameState.currentBet.toLocaleString(), 'info'); terminalOutput('Player charges: ' + gameState.playerCharges, 'info'); terminalOutput('Dealer charges: ' + gameState.dealerCharges, 'info'); terminalOutput('Shells left: ' + (gameState.shells.length - gameState.currentIndex), 'info'); } },
+            'version': { desc: 'Show terminal version', func: () => terminalOutput('Buckshot Cheat Terminal v2.0 - Enhanced Edition', 'info') },
+            'credits': { desc: 'Show credits', func: () => { terminalOutput('=== CREDITS ===', 'info'); terminalOutput('Developer: CheatMaster3000', 'info'); terminalOutput('Version: 2.0', 'info'); terminalOutput('Never miss again!', 'success'); } }
+        };
+        
+        function toggleTerminal() {
+            const terminal = document.getElementById('cheat-terminal');
+            terminal.classList.toggle('visible');
+            if (terminal.classList.contains('visible')) {
+                document.getElementById('terminal-input').focus();
+            }
+        }
+        
+        function terminalOutput(text, type = '') {
+            const output = document.getElementById('terminal-output');
+            const line = document.createElement('div');
+            line.textContent = text;
+            if (type) line.className = type;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function showHelp() {
+            terminalOutput('Available Cheats:', 'info');
+            for (let cmd in CHEATS) {
+                terminalOutput(`  ${cmd} - ${CHEATS[cmd].desc}`);
+            }
+        }
+        
+        function revealNextShell() {
+            if (gameState.currentIndex >= gameState.shells.length) {
+                terminalOutput('No shells remaining!', 'error');
+                return;
+            }
+            const shell = gameState.shells[gameState.currentIndex];
+            terminalOutput(`Next shell is: ${shell.toUpperCase()}`, shell === 'live' ? 'warning' : 'success');
+        }
+        
+        function revealAllShells() {
+            const remaining = gameState.shells.slice(gameState.currentIndex);
+            const live = remaining.filter(s => s === 'live').length;
+            const blank = remaining.filter(s => s === 'blank').length;
+            terminalOutput(`Remaining: ${live} live, ${blank} blank`, 'info');
+            remaining.forEach((s, i) => {
+                terminalOutput(`  Shell ${gameState.currentIndex + i + 1}: ${s}`);
+            });
+        }
+        
+        function healPlayer() {
+            const config = ROUND_CONFIG[gameState.round];
+            const healed = config.charges - gameState.playerCharges;
+            gameState.playerCharges = config.charges;
+            updateUI();
+            terminalOutput(`Healed ${healed} charges!`, 'success');
+        }
+        
+        function fullHeal() {
+            const config = ROUND_CONFIG[gameState.round];
+            gameState.playerCharges = config.charges;
+            gameState.dealerCharges = config.charges;
+            updateUI();
+            terminalOutput('Both players fully healed!', 'success');
+        }
+        
+        function killDealer() {
+            gameState.dealerCharges = 0;
+            updateUI();
+            handleRoundEnd(true);
+            terminalOutput('Dealer killed!', 'success');
+        }
+        
+        function killPlayer() {
+            gameState.playerCharges = 0;
+            updateUI();
+            handleRoundEnd(false);
+            terminalOutput('You died!', 'error');
+        }
+        
+        function skipRound() {
+            gameState.round++;
+            if (gameState.round >= gameState.totalRounds) {
+                showDoubleOrNothing();
+            } else {
+                initRound(gameState.round);
+                terminalOutput(`Skipped to round ${gameState.round + 1}`, 'info');
+            }
+        }
+        
+        function winRound() {
+            gameState.dealerCharges = 0;
+            updateUI();
+            handleRoundEnd(true);
+            terminalOutput('Round won!', 'success');
+        }
+        
+        function loseRound() {
+            gameState.playerCharges = 0;
+            updateUI();
+            handleRoundEnd(false);
+            terminalOutput('Round lost!', 'error');
+        }
+        
+        function addMoney(amount) {
+            gameState.bank += amount;
+            updateBankDisplays();
+            terminalOutput(`Added $${amount.toLocaleString()}! New balance: $${gameState.bank.toLocaleString()}`, 'success');
+        }
+        
+        function getAllItems() {
+            const allItemKeys = ['magnifyingGlass', 'beer', 'handcuffs', 'handSaw', 'cigarettes', 'pills', 'inverter', 'adrenaline', 'burnerPhone', 'expiredMedicine'];
+            allItemKeys.forEach(key => {
+                gameState.playerItems.push({ ...ITEMS[key], key: key, used: false });
+            });
+            updateUI();
+            terminalOutput('All items acquired!', 'success');
+        }
+        
+        function infiniteAmmo() {
+            gameState.shells = gameState.shells.concat(['blank', 'blank', 'blank']);
+            updateUI();
+            terminalOutput('Infinite ammo enabled!', 'success');
+        }
+        
+        function godMode() {
+            gameState.playerCharges = 999;
+            updateUI();
+            terminalOutput('GOD MODE ACTIVATED!', 'warning');
+        }
+        
+        function seeDealerItems() {
+            if (gameState.dealerItems.length === 0) {
+                terminalOutput('Dealer has no items!', 'info');
+            } else {
+                terminalOutput('Dealer items: ' + gameState.dealerItems.map(i => i.name).join(', '), 'info');
+            }
+        }
+        
+        function rerollShell() {
+            if (gameState.currentIndex >= gameState.shells.length) {
+                terminalOutput('No shells to reroll!', 'error');
+                return;
+            }
+            gameState.shells[gameState.currentIndex] = Math.random() > 0.5 ? 'live' : 'blank';
+            terminalOutput('Shell rerolled!', 'success');
+        }
+        
+        function makeNextLive() {
+            if (gameState.currentIndex >= gameState.shells.length) {
+                terminalOutput('No shells!', 'error');
+                return;
+            }
+            gameState.shells[gameState.currentIndex] = 'live';
+            terminalOutput('Next shell is now LIVE!', 'warning');
+        }
+        
+        function makeNextBlank() {
+            if (gameState.currentIndex >= gameState.shells.length) {
+                terminalOutput('No shells!', 'error');
+                return;
+            }
+            gameState.shells[gameState.currentIndex] = 'blank';
+            terminalOutput('Next shell is now BLANK!', 'success');
+        }
+        
+        function clearTerminal() {
+            document.getElementById('terminal-output').innerHTML = '<div>PS C:\\Users\\Player> Buckshot Cheat Terminal v1.0</div><div>Type \'help\' for available commands</div><div>----------------------------------------</div>';
+        }
+        
+        document.getElementById('terminal-input').addEventListener('input', function(e) {
+            const input = this.value.toLowerCase().trim();
+            const autocomplete = document.getElementById('terminal-autocomplete');
+            
+            if (!input) {
+                autocomplete.classList.remove('visible');
+                return;
+            }
+            
+            // Find matching commands
+            const matches = Object.keys(CHEATS).filter(cmd => cmd.startsWith(input));
+            
+            if (matches.length === 0) {
+                autocomplete.classList.remove('visible');
+                return;
+            }
+            
+            // Build autocomplete list
+            autocomplete.innerHTML = '';
+            matches.forEach(cmd => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${cmd}</span><span class="desc">${CHEATS[cmd].desc}</span>`;
+                li.onclick = () => {
+                    this.value = cmd;
+                    autocomplete.classList.remove('visible');
+                    this.focus();
+                };
+                autocomplete.appendChild(li);
+            });
+            
+            autocomplete.classList.add('visible');
+        });
+        
+        document.getElementById('terminal-input').addEventListener('keydown', function(e) {
+            const autocomplete = document.getElementById('terminal-autocomplete');
+            
+            if (e.key === 'Enter') {
+                const cmd = this.value.trim().toLowerCase();
+                this.value = '';
+                autocomplete.classList.remove('visible');
+                terminalOutput('PS C:\\Users\\Player> ' + cmd);
+                
+                if (CHEATS[cmd]) {
+                    try {
+                        CHEATS[cmd].func();
+                        setTimeout(() => {
+                            document.getElementById('cheat-terminal').classList.remove('visible');
+                        }, 500);
+                    } catch (e) {
+                        terminalOutput('Error: ' + e.message, 'error');
+                    }
+                } else if (cmd) {
+                    terminalOutput('Unknown command: ' + cmd + '. Type \'help\' for list.', 'error');
+                    setTimeout(() => {
+                        document.getElementById('cheat-terminal').classList.remove('visible');
+                    }, 500);
+                }
+            } else if (e.key === 'Tab') {
+                const input = this.value.toLowerCase().trim();
+                const matches = Object.keys(CHEATS).filter(cmd => cmd.startsWith(input));
+                if (matches.length === 1) {
+                    this.value = matches[0];
+                    e.preventDefault();
+                }
+            } else if (e.key === 'Escape') {
+                autocomplete.classList.remove('visible');
+            }
+        });
+        
+        // Global keyboard shortcuts (E to start, C for terminal)
+        document.addEventListener('keydown', function(e) {
+            // 'E' key to start game from title screen
+            if (e.key === 'e' || e.key === 'E') {
+                const titleScreen = document.getElementById('title-screen');
+                const computedStyle = window.getComputedStyle(titleScreen).display;
+                if (titleScreen.style.display === '' && computedStyle === 'flex') {
+                    goToBetting();
+                    return;
+                }
+            }
+            // 'C' key for cheat terminal (only when game is active)
+            if (e.key === 'c' || e.key === 'C') {
+                const gameContainer = document.getElementById('game-container');
+                const computedStyle = window.getComputedStyle(gameContainer).display;
+                if (gameContainer.style.display === '' && computedStyle === 'flex' || 
+                    gameContainer.style.display === 'flex') {
+                    e.preventDefault();
+                    toggleTerminal();
+                }
+            }
+        });
+    </script>
+
+</body></html>
